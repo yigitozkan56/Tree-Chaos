@@ -1,6 +1,6 @@
-# 3D Kaos Motoru (3D Chaos Engine)
+# 3D Chaos Engine
 
-**3D Kaos Motoru** is a lightweight, high-performance Windows C++ 3D procedural fractal tree simulation engine. Built from scratch without heavy external graphics libraries, it utilizes native Win32 API and GDI software rasterization to render intricate, organically growing 3D tree structures in real time.
+**3D Chaos Engine** is a lightweight, high-performance Windows C++ 3D procedural fractal tree simulation engine. Built from scratch without heavy external graphics libraries, it utilizes native Win32 API and GDI software rasterization to render intricate, organically growing 3D tree structures in real time.
 
 ---
 
