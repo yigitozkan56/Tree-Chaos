@@ -406,22 +406,23 @@ void CizArayuz(HDC hdc) {
         DeleteObject(hPen);
 
         SetTextColor(hdc, RGB(0, 255, 200));
-        TextOutA(hdc, 35, 30, "=== KAOS MOTORU AYARLAR SEKMESI ===", 35);
+        const char* titleStr = "=== CHAOS ENGINE SETTINGS MENU ===";
+        TextOutA(hdc, 35, 30, titleStr, (int)strlen(titleStr));
 
         SelectObject(hdc, hFontNormal);
         SetTextColor(hdc, RGB(220, 220, 220));
 
-        const char* paletIsimleri[] = { "1: Spektrum", "2: Okyanus/Cyan", "3: Ates/Amber", "4: Orman Yesili", "5: Neon/Mor" };
-        std::string strPalet = "Dal Renk Paleti  : " + std::string(paletIsimleri[renkPaleti]);
-        std::string strDugum = "Kirilma Noktalari: " + std::string(dugumleriGoster ? "[ ACIK ] (N)" : "[ KAPALI ] (N)");
-        std::string strDagilma = "Dagilma Ihtimali : %" + std::to_string((int)(dagilmaOrani * 100)) + " (O / L)";
-        std::string strAralik = "KisaliK Sikligi  : Her " + std::to_string(kisalmaAraligi) + " Turda Bir (Yukari/Asagi)";
+        const char* paletIsimleri[] = { "1: Spectrum", "2: Ocean/Cyan", "3: Fire/Amber", "4: Forest Green", "5: Neon/Purple" };
+        std::string strPalet = "Branch Color Palette : " + std::string(paletIsimleri[renkPaleti]);
+        std::string strDugum = "Branching Nodes      : " + std::string(dugumleriGoster ? "[ ON ] (N)" : "[ OFF ] (N)");
+        std::string strDagilma = "Branching Chance     : " + std::to_string((int)(dagilmaOrani * 100)) + "% (O / L)";
+        std::string strAralik = "Shortening Interval  : Every " + std::to_string(kisalmaAraligi) + " Rounds (Up/Down)";
 
         std::ostringstream ssKok;
         ssKok << std::fixed << std::setprecision(1) << kokUzunlugu;
 
-        std::string strOran = "KisaliK CarpanI  : %" + std::to_string((int)(kisalmaOrani * 100)) + " (Sol/Sag)";
-        std::string strKok = "Kok Dal Uzunlugu : " + ssKok.str() + " Birim (U/J)";
+        std::string strOran = "Shortening Ratio     : " + std::to_string((int)(kisalmaOrani * 100)) + "% (Left/Right)";
+        std::string strKok = "Root Branch Length   : " + ssKok.str() + " Units (U/J)";
 
         TextOutA(hdc, 35, 60, strPalet.c_str(), (int)strPalet.length());
         TextOutA(hdc, 35, 90, strDugum.c_str(), (int)strDugum.length());
@@ -431,18 +432,20 @@ void CizArayuz(HDC hdc) {
         TextOutA(hdc, 35, 210, strKok.c_str(), (int)strKok.length());
 
         SetTextColor(hdc, RGB(150, 150, 150));
-        TextOutA(hdc, 35, 260, "[TAB]: Menuyu Gizle | [R]: Agaci Sifirla", 39);
+        const char* menuHideStr = "[TAB]: Hide Menu | [R]: Reset Tree";
+        TextOutA(hdc, 35, 260, menuHideStr, (int)strlen(menuHideStr));
     }
     else {
         SetTextColor(hdc, RGB(0, 200, 255));
-        TextOutA(hdc, 20, 20, "[TAB]: Ayarlar Menusunu Ac", 27);
+        const char* menuOpenStr = "[TAB]: Open Settings Menu";
+        TextOutA(hdc, 20, 20, menuOpenStr, (int)strlen(menuOpenStr));
     }
 
     SelectObject(hdc, hFontBold);
 
-    std::string strSonUretilen = "Son Uretilen Dal: " + std::to_string(sonUretilenDal);
-    std::string strTur = "Tur: " + std::to_string(mevcutTur);
-    std::string strAktif = "Ucu Acik Dal: " + std::to_string(aktifDalIndeksleri.size());
+    std::string strSonUretilen = "Last Generated Branches: " + std::to_string(sonUretilenDal);
+    std::string strTur = "Round: " + std::to_string(mevcutTur);
+    std::string strAktif = "Active End Branches: " + std::to_string(aktifDalIndeksleri.size());
 
     RECT rectSonUretilen = { GENISLIK - 400, YUKSEKLIK - 92, GENISLIK - 20, YUKSEKLIK - 65 };
     RECT rectTur = { GENISLIK - 400, YUKSEKLIK - 65, GENISLIK - 20, YUKSEKLIK - 38 };
@@ -603,7 +606,7 @@ int main() {
 
     RegisterClassA(&wc);
 
-    HWND hwnd = CreateWindowA("KaosAgaci3DClass", "3D Kaos Motoru",
+    HWND hwnd = CreateWindowA("KaosAgaci3DClass", "3D Chaos Engine",
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
         GENISLIK, YUKSEKLIK, NULL, NULL, hInstance, NULL);
 
@@ -640,7 +643,7 @@ int main() {
 
         CizArayuz(hdc);
 
-        std::string baslik = "3D Kaos Motoru | [TAB]: Menu | [O/L]: Dagilma %" + std::to_string((int)(dagilmaOrani * 100));
+        std::string baslik = "3D Chaos Engine | [TAB]: Menu | [O/L]: Branching " + std::to_string((int)(dagilmaOrani * 100)) + "%";
         SetWindowTextA(hwnd, baslik.c_str());
     }
 
