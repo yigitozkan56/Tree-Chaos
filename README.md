@@ -52,15 +52,15 @@
 
 ## 📼 Media
 
-<img width="400" height="150" alt="Ekran görüntüsü 2026-10-10 122806" src="https://github.com/user-attachments/assets/d2fe5be3-41f8-4721-969d-f4994f02ca14" />
+<img width="400" height="100" alt="Ekran görüntüsü 2026-10-10 122806" src="https://github.com/user-attachments/assets/d2fe5be3-41f8-4721-969d-f4994f02ca14" />
 
-<img width="400" height="150" alt="Ekran görüntüsü 2026-10-10 122829" src="https://github.com/user-attachments/assets/6847d2dd-eaf6-4aca-a03e-08ca4300c825" />
+<img width="400" height="100" alt="Ekran görüntüsü 2026-10-10 122829" src="https://github.com/user-attachments/assets/6847d2dd-eaf6-4aca-a03e-08ca4300c825" />
 
-<img width="400" height="150" alt="Ekran görüntüsü 2026-10-10 122847" src="https://github.com/user-attachments/assets/0c7853a6-ff3a-4901-bd36-6e08c23c0080" />
+<img width="400" height="100" alt="Ekran görüntüsü 2026-10-10 122847" src="https://github.com/user-attachments/assets/0c7853a6-ff3a-4901-bd36-6e08c23c0080" />
 
-<img width="400" height="150" alt="Ekran görüntüsü 2026-10-10 122930" src="https://github.com/user-attachments/assets/e098bd0b-a3aa-4bc4-9dea-551d3611a06e" />
+<img width="400" height="100" alt="Ekran görüntüsü 2026-10-10 122930" src="https://github.com/user-attachments/assets/e098bd0b-a3aa-4bc4-9dea-551d3611a06e" />
 
-<img width="400" height="150" alt="Ekran görüntüsü 2026-10-10 122946" src="https://github.com/user-attachments/assets/edcdecb5-9149-49f3-bddd-f5dcec77d3c0" />
+<img width="400" height="100" alt="Ekran görüntüsü 2026-10-10 122946" src="https://github.com/user-attachments/assets/edcdecb5-9149-49f3-bddd-f5dcec77d3c0" />
 
 ---
 
