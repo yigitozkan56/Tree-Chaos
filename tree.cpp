@@ -45,7 +45,7 @@ struct Dal3D {
     float uzunluk;
     int tur;
     int ebeveyn_idx;
-    int cocuk_sayisi; // Bu dalın ucundan (kırılma noktasından) çıkan dal sayısı
+    int cocuk_sayisi; // Bu kirilma noktasindan (p2) cikan dal sayisi
 };
 
 const int GENISLIK = 1280;
@@ -77,7 +77,7 @@ float dagilmaOrani = 0.50f;
 int kisalmaAraligi = 15;
 float kisalmaOrani = 0.50f;
 float kokUzunlugu = 8.0f;
-bool dugumYenidenDallanma = false; // 2 dal çıkan kırılma noktasından tekrar dal çıkıp çıkmama ayarı
+bool dugumYenidenDallanma = false; // 2 dal cikan dugumden tekrar dal cikip cikmama ayari
 
 uint32_t HSVtoRGB(float h, float s, float v) {
     float c = v * s;
@@ -252,8 +252,8 @@ void KameraKlavyeKontrolu() {
     if (GetAsyncKeyState('S') & 0x8000) camPos = Sub(camPos, Scale(fwd, moveSpeed));
     if (GetAsyncKeyState('A') & 0x8000) camPos = Sub(camPos, Scale(rgt, moveSpeed));
     if (GetAsyncKeyState('D') & 0x8000) camPos = Add(camPos, Scale(rgt, moveSpeed));
-    if (GetAsyncKeyState('E') & 0x8000) camPos.y -= moveSpeed;
-    if (GetAsyncKeyState('Q') & 0x8000) camPos.y += moveSpeed;
+    if (GetAsyncKeyState('E') & 0x8000) camPos.y -= moveSpeed; // Yukari
+    if (GetAsyncKeyState('Q') & 0x8000) camPos.y += moveSpeed; // Asagi
 }
 
 Vector3 SapmaEkle3D(const Vector3& dir, float aciMiktari) {
@@ -281,7 +281,7 @@ void TurHesapla3D() {
     for (int idx : aktifDalIndeksleri) {
         Dal3D& ata = tumDallar[idx];
 
-        // Eğer yeniden dallanma KAPALI ise ve bu noktadan zaten 2 dal çıkmışsa yeni dal vermesini engelle
+        // Dugumden yeniden dallanma KAPALI ise ve 2 dal cikmissa yeni dal cikisini engelle
         if (!dugumYenidenDallanma && ata.cocuk_sayisi >= 2) {
             continue;
         }
@@ -306,7 +306,7 @@ void TurHesapla3D() {
                 }
             }
 
-            // Eğer ayar AÇIK ise, 2 dal verse dahi ata dal aktif havuzda kalmaya devam eder
+            // Dugumden yeniden dallanma ACIK ise, ata dugum aktif kalmaya devam eder
             if (dugumYenidenDallanma) {
                 yeniAktifler.push_back(idx);
             }
@@ -343,7 +343,7 @@ void AgaciSifirla3D() {
     secilenDalIdx = -1;
 
     Dal3D kokYukari = { {0, 0, 0}, {0, -kokUzunlugu, 0}, {0, -1, 0}, kokUzunlugu, 1, -1, 0 };
-    Dal3D kokAsagi = { {0, 0, 0}, {0,  kokUzunlugu, 0}, {0,  1, 0}, kokUzunlugu, 1, -1, 0 };
+    Dal3D kokAsagi  = { {0, 0, 0}, {0,  kokUzunlugu, 0}, {0,  1, 0}, kokUzunlugu, 1, -1, 0 };
 
     tumDallar.push_back(kokYukari);
     tumDallar.push_back(kokAsagi);
@@ -416,29 +416,29 @@ void CizArayuz(HDC hdc) {
         HPEN hPen = CreatePen(PS_SOLID, 2, RGB(0, 200, 255));
         SelectObject(hdc, hBrush);
         SelectObject(hdc, hPen);
-        Rectangle(hdc, 20, 20, 520, 340);
+        Rectangle(hdc, 20, 20, 530, 340);
         DeleteObject(hBrush);
         DeleteObject(hPen);
 
         SetTextColor(hdc, RGB(0, 255, 200));
-        const char* titleStr = "=== CHAOS ENGINE SETTINGS MENU ===";
+        const char* titleStr = "=== KAOS MOTORU AYARLAR MENUSU ===";
         TextOutA(hdc, 35, 30, titleStr, (int)strlen(titleStr));
 
         SelectObject(hdc, hFontNormal);
         SetTextColor(hdc, RGB(220, 220, 220));
 
-        const char* paletIsimleri[] = { "1: Spectrum", "2: Ocean/Cyan", "3: Fire/Amber", "4: Forest Green", "5: Neon/Purple" };
-        std::string strPalet = "Branch Color Palette : " + std::string(paletIsimleri[renkPaleti]);
-        std::string strDugum = "Branching Nodes      : " + std::string(dugumleriGoster ? "[ ON ] (N)" : "[ OFF ] (N)");
-        std::string strDagilma = "Branching Chance     : " + std::to_string((int)(dagilmaOrani * 100)) + "% (O / L)";
-        std::string strAralik = "Shortening Interval  : Every " + std::to_string(kisalmaAraligi) + " Rounds (Up/Down)";
+        const char* paletIsimleri[] = { "1: Spektrum", "2: Okyanus/Cyan", "3: Ates/Amber", "4: Orman Yesili", "5: Neon/Mor" };
+        std::string strPalet = "Dal Renk Paleti        : " + std::string(paletIsimleri[renkPaleti]);
+        std::string strDugum = "Kirilma Noktalari      : " + std::string(dugumleriGoster ? "[ ACIK ] (N)" : "[ KAPALI ] (N)");
+        std::string strDagilma = "Dallanma Ihtimali      : %" + std::to_string((int)(dagilmaOrani * 100)) + " (O / L)";
+        std::string strAralik = "Kisalma Sikligi        : Her " + std::to_string(kisalmaAraligi) + " Turda Bir (Yukari/Asagi)";
 
         std::ostringstream ssKok;
         ssKok << std::fixed << std::setprecision(1) << kokUzunlugu;
 
-        std::string strOran = "Shortening Ratio     : " + std::to_string((int)(kisalmaOrani * 100)) + "% (Left/Right)";
-        std::string strKok = "Root Branch Length   : " + ssKok.str() + " Units (U/J)";
-        std::string strYeniden = "Node Re-branching    : " + std::string(dugumYenidenDallanma ? "[ ALLOWED ] (B)" : "[ BLOCKED ] (B)");
+        std::string strOran = "Kisalma Carpani        : %" + std::to_string((int)(kisalmaOrani * 100)) + " (Sol/Sag)";
+        std::string strKok = "Kok Dal Uzunlugu       : " + ssKok.str() + " Birim (U/J)";
+        std::string strYeniden = "Dugumden Tekrar Dal    : " + std::string(dugumYenidenDallanma ? "[ IZINLI ] (B)" : "[ KILITLI ] (B)");
 
         TextOutA(hdc, 35, 60, strPalet.c_str(), (int)strPalet.length());
         TextOutA(hdc, 35, 90, strDugum.c_str(), (int)strDugum.length());
@@ -449,24 +449,24 @@ void CizArayuz(HDC hdc) {
         TextOutA(hdc, 35, 240, strYeniden.c_str(), (int)strYeniden.length());
 
         SetTextColor(hdc, RGB(150, 150, 150));
-        const char* menuHideStr = "[TAB]: Hide Menu | [R]: Reset Tree";
+        const char* menuHideStr = "[TAB]: Menuyu Gizle | [R]: Agaci Sifirla";
         TextOutA(hdc, 35, 290, menuHideStr, (int)strlen(menuHideStr));
     }
     else {
         SetTextColor(hdc, RGB(0, 200, 255));
-        const char* menuOpenStr = "[TAB]: Open Settings Menu";
+        const char* menuOpenStr = "[TAB]: Ayarlar Menusunu Ac";
         TextOutA(hdc, 20, 20, menuOpenStr, (int)strlen(menuOpenStr));
     }
 
     SelectObject(hdc, hFontBold);
 
-    std::string strSonUretilen = "Last Generated Branches: " + std::to_string(sonUretilenDal);
-    std::string strTur = "Round: " + std::to_string(mevcutTur);
-    std::string strAktif = "Active End Branches: " + std::to_string(aktifDalIndeksleri.size());
+    std::string strSonUretilen = "Son Uretilen Dal: " + std::to_string(sonUretilenDal);
+    std::string strTur = "Tur: " + std::to_string(mevcutTur);
+    std::string strAktif = "Ucu Acik (Aktif) Dal: " + std::to_string(aktifDalIndeksleri.size());
 
-    RECT rectSonUretilen = { GENISLIK - 400, YUKSEKLIK - 92, GENISLIK - 20, YUKSEKLIK - 65 };
-    RECT rectTur = { GENISLIK - 400, YUKSEKLIK - 65, GENISLIK - 20, YUKSEKLIK - 38 };
-    RECT rectAktif = { GENISLIK - 400, YUKSEKLIK - 38, GENISLIK - 20, YUKSEKLIK - 10 };
+    RECT rectSonUretilen = { GENISLIK - 420, YUKSEKLIK - 92, GENISLIK - 20, YUKSEKLIK - 65 };
+    RECT rectTur = { GENISLIK - 420, YUKSEKLIK - 65, GENISLIK - 20, YUKSEKLIK - 38 };
+    RECT rectAktif = { GENISLIK - 420, YUKSEKLIK - 38, GENISLIK - 20, YUKSEKLIK - 10 };
 
     SetTextColor(hdc, RGB(200, 150, 255));
     DrawTextA(hdc, strSonUretilen.c_str(), -1, &rectSonUretilen, DT_RIGHT | DT_SINGLELINE | DT_VCENTER);
@@ -627,7 +627,7 @@ int main() {
 
     RegisterClassA(&wc);
 
-    HWND hwnd = CreateWindowA("KaosAgaci3DClass", "3D Chaos Engine",
+    HWND hwnd = CreateWindowA("KaosAgaci3DClass", "3D Kaos Motoru",
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
         GENISLIK, YUKSEKLIK, NULL, NULL, hInstance, NULL);
 
@@ -664,7 +664,9 @@ int main() {
 
         CizArayuz(hdc);
 
-        std::string baslik = "3D Chaos Engine | [TAB]: Menu | [B]: Re-branch " + std::string(dugumYenidenDallanma ? "ON" : "OFF");
+        std::string baslik = "3D Kaos Motoru | [TAB]: Menu | [B]: Yeniden Dallanma " + 
+                             std::string(dugumYenidenDallanma ? "[IZINLI]" : "[KILITLI]") + 
+                             " | Dallanma: %" + std::to_string((int)(dagilmaOrani * 100));
         SetWindowTextA(hwnd, baslik.c_str());
     }
 
