@@ -45,6 +45,7 @@ struct Dal3D {
     float uzunluk;
     int tur;
     int ebeveyn_idx;
+    int cocuk_sayisi; // Bu dalın ucundan (kırılma noktasından) çıkan dal sayısı
 };
 
 const int GENISLIK = 1280;
@@ -76,6 +77,7 @@ float dagilmaOrani = 0.50f;
 int kisalmaAraligi = 15;
 float kisalmaOrani = 0.50f;
 float kokUzunlugu = 8.0f;
+bool dugumYenidenDallanma = false; // 2 dal çıkan kırılma noktasından tekrar dal çıkıp çıkmama ayarı
 
 uint32_t HSVtoRGB(float h, float s, float v) {
     float c = v * s;
@@ -277,7 +279,13 @@ void TurHesapla3D() {
     float scaleFactor = (mevcutTur % kisalmaAraligi == 0) ? kisalmaOrani : 1.0f;
 
     for (int idx : aktifDalIndeksleri) {
-        Dal3D ata = tumDallar[idx];
+        Dal3D& ata = tumDallar[idx];
+
+        // Eğer yeniden dallanma KAPALI ise ve bu noktadan zaten 2 dal çıkmışsa yeni dal vermesini engelle
+        if (!dugumYenidenDallanma && ata.cocuk_sayisi >= 2) {
+            continue;
+        }
+
         float zar = (float)rand() / RAND_MAX;
 
         if (zar < dagilmaOrani) {
@@ -288,13 +296,19 @@ void TurHesapla3D() {
 
                 float dinamikMesafe = yUzunluk * 0.35f;
                 if (!CakisiyorMu3D(p2, dinamikMesafe * dinamikMesafe)) {
-                    Dal3D yeniDal = { ata.p2, p2, yDir, yUzunluk, mevcutTur, idx };
+                    Dal3D yeniDal = { ata.p2, p2, yDir, yUzunluk, mevcutTur, idx, 0 };
                     tumDallar.push_back(yeniDal);
                     int yeniIdx = (int)tumDallar.size() - 1;
                     IzgarayaEkle3D(yeniIdx);
                     yeniAktifler.push_back(yeniIdx);
                     buTurUretilen++;
+                    ata.cocuk_sayisi++;
                 }
+            }
+
+            // Eğer ayar AÇIK ise, 2 dal verse dahi ata dal aktif havuzda kalmaya devam eder
+            if (dugumYenidenDallanma) {
+                yeniAktifler.push_back(idx);
             }
         }
         else {
@@ -304,12 +318,13 @@ void TurHesapla3D() {
 
             float dinamikMesafe = yUzunluk * 0.35f;
             if (!CakisiyorMu3D(p2, dinamikMesafe * dinamikMesafe)) {
-                Dal3D yeniDal = { ata.p2, p2, yDir, yUzunluk, mevcutTur, idx };
+                Dal3D yeniDal = { ata.p2, p2, yDir, yUzunluk, mevcutTur, idx, 0 };
                 tumDallar.push_back(yeniDal);
                 int yeniIdx = (int)tumDallar.size() - 1;
                 IzgarayaEkle3D(yeniIdx);
                 yeniAktifler.push_back(yeniIdx);
                 buTurUretilen++;
+                ata.cocuk_sayisi++;
             }
         }
     }
@@ -327,8 +342,8 @@ void AgaciSifirla3D() {
     sonUretilenDal = 2;
     secilenDalIdx = -1;
 
-    Dal3D kokYukari = { {0, 0, 0}, {0, -kokUzunlugu, 0}, {0, -1, 0}, kokUzunlugu, 1, -1 };
-    Dal3D kokAsagi = { {0, 0, 0}, {0,  kokUzunlugu, 0}, {0,  1, 0}, kokUzunlugu, 1, -1 };
+    Dal3D kokYukari = { {0, 0, 0}, {0, -kokUzunlugu, 0}, {0, -1, 0}, kokUzunlugu, 1, -1, 0 };
+    Dal3D kokAsagi = { {0, 0, 0}, {0,  kokUzunlugu, 0}, {0,  1, 0}, kokUzunlugu, 1, -1, 0 };
 
     tumDallar.push_back(kokYukari);
     tumDallar.push_back(kokAsagi);
@@ -401,7 +416,7 @@ void CizArayuz(HDC hdc) {
         HPEN hPen = CreatePen(PS_SOLID, 2, RGB(0, 200, 255));
         SelectObject(hdc, hBrush);
         SelectObject(hdc, hPen);
-        Rectangle(hdc, 20, 20, 500, 310);
+        Rectangle(hdc, 20, 20, 520, 340);
         DeleteObject(hBrush);
         DeleteObject(hPen);
 
@@ -423,6 +438,7 @@ void CizArayuz(HDC hdc) {
 
         std::string strOran = "Shortening Ratio     : " + std::to_string((int)(kisalmaOrani * 100)) + "% (Left/Right)";
         std::string strKok = "Root Branch Length   : " + ssKok.str() + " Units (U/J)";
+        std::string strYeniden = "Node Re-branching    : " + std::string(dugumYenidenDallanma ? "[ ALLOWED ] (B)" : "[ BLOCKED ] (B)");
 
         TextOutA(hdc, 35, 60, strPalet.c_str(), (int)strPalet.length());
         TextOutA(hdc, 35, 90, strDugum.c_str(), (int)strDugum.length());
@@ -430,10 +446,11 @@ void CizArayuz(HDC hdc) {
         TextOutA(hdc, 35, 150, strAralik.c_str(), (int)strAralik.length());
         TextOutA(hdc, 35, 180, strOran.c_str(), (int)strOran.length());
         TextOutA(hdc, 35, 210, strKok.c_str(), (int)strKok.length());
+        TextOutA(hdc, 35, 240, strYeniden.c_str(), (int)strYeniden.length());
 
         SetTextColor(hdc, RGB(150, 150, 150));
         const char* menuHideStr = "[TAB]: Hide Menu | [R]: Reset Tree";
-        TextOutA(hdc, 35, 260, menuHideStr, (int)strlen(menuHideStr));
+        TextOutA(hdc, 35, 290, menuHideStr, (int)strlen(menuHideStr));
     }
     else {
         SetTextColor(hdc, RGB(0, 200, 255));
@@ -526,6 +543,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         }
         else if (wParam == 'N') {
             dugumleriGoster = !dugumleriGoster;
+            InvalidateRect(hwnd, NULL, FALSE);
+        }
+        else if (wParam == 'B') {
+            dugumYenidenDallanma = !dugumYenidenDallanma;
             InvalidateRect(hwnd, NULL, FALSE);
         }
         else if (wParam == 'O') {
@@ -643,7 +664,7 @@ int main() {
 
         CizArayuz(hdc);
 
-        std::string baslik = "3D Chaos Engine | [TAB]: Menu | [O/L]: Branching " + std::to_string((int)(dagilmaOrani * 100)) + "%";
+        std::string baslik = "3D Chaos Engine | [TAB]: Menu | [B]: Re-branch " + std::string(dugumYenidenDallanma ? "ON" : "OFF");
         SetWindowTextA(hwnd, baslik.c_str());
     }
 
