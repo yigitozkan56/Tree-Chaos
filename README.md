@@ -47,6 +47,7 @@
 | **Up / Down** | Increase / decrease shortening interval frequency |
 | **Left / Right** | Increase / decrease shortening multiplier ratio |
 | **U / J** | Increase / decrease initial root branch length |
+| **B** | Allowed / Blocked node Re-branching |
 
 ---
 
